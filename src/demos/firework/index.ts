@@ -15,13 +15,13 @@ scene = new Scene({
 })
 
 camera = new Camera({
-    position: { x: 0, y: 2, z: 150 },
+    position: { x: 0, y: 2, z: 100 },
     rotation: { x: 0, y: 0, z: 0 },
 })
 
 
 const fireWork = new FireWork({
-    meteorNum: 100,
+    meteorNum: 150,
     pos: new Vec3(0, 0, 0)
 })
 scene.add(fireWork)
@@ -32,11 +32,11 @@ scene.add(fireWork)
 // })
 // scene.add(fireWork2)
 
-const cube1 = new Cube({ position: { x: 0, y: 0, z: 0 }, rotation: { x: 0, y: 0, z: 0 }, scale: { x: 1, y: 1, z: 1 } })
-scene.add(cube1)
+// const cube1 = new Cube({ position: { x: 0, y: 0, z: 0 }, rotation: { x: 0, y: 0, z: 0 }, scale: { x: 1, y: 1, z: 1 } })
+// scene.add(cube1)
 
-const cube2 = new Cube({ position: { x: 3, y: 0, z: 0 } })
-cube1.add(cube2)
+// const cube2 = new Cube({ position: { x: 3, y: 0, z: 0 } })
+// cube1.add(cube2)
 
 const axesHelper = new AxesHelper()
 scene.add(axesHelper)

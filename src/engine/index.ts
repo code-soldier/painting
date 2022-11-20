@@ -11,3 +11,6 @@ export { AxesHelper } from './AxesHelper'
 export { Fly1Control, OrbitControl } from './Control'
 export { Line } from './Line'
 
+export { RendererGL } from './RendererGL'
+export { ObjectGL } from './ObjectGL'
+

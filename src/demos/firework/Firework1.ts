@@ -2,7 +2,7 @@ import { ObjectGPU, Vec3, Vec4, Mat4 } from "@/engine/index";
 
 const MAX_METEOR_NUM = 1000
 const MAX_SPARK_NUM = 1000
-const GRAVITY = -7/1000000
+const GRAVITY = -9
 
 export class FireWork extends ObjectGPU {
 
@@ -26,7 +26,7 @@ export class FireWork extends ObjectGPU {
         this.onRenderCb = this.frame
         for (let i = 0; i < meteorNum; i++) {
             const ranV = () => Math.random() * 2 - 1
-            let vel = new Vec4(ranV(), ranV(), ranV(), 20/10)
+            let vel = new Vec4(ranV(), ranV(), ranV(), 20)
             this.meteors.push(new Meteor({
                 birth: this.birth,
                 pos: this.pos.clone(),
@@ -60,7 +60,7 @@ class Meteor {
     sparks: Spark[] = [] //火星
     meteorHead: MeteorHead
     produceCount: number = 0 //计数 每多少帧添加一次火星
-    produceCycle = 8
+    produceCycle = 0
 
     constructor(params: {
         birth: number
@@ -87,7 +87,7 @@ class Meteor {
 
     addSpark(now: number) { //前期产生慢
         this.produceCount++
-        if (this.produceCount == 8) {
+        if (this.produceCount == 5) {
             this.produceCount = 0
             const f = (num:number) => num+random(-1,1)
             this.sparks.push(new Spark({

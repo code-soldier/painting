@@ -18,7 +18,6 @@ export abstract class Control {
 
 /**
  * 矢量飞行控制
- * 移动时的“前方向“为视线”前方向“在世界xoz平面的投影
  */
 export class Fly1Control extends Control {
 
