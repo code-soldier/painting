@@ -39,7 +39,7 @@ scene.add(fireWork)
 // cube1.add(cube2)
 
 const axesHelper = new AxesHelper()
-scene.add(axesHelper)
+// scene.add(axesHelper)
 
 // const skyBox = new SkyBox({
 //     imgs: importImg(),

@@ -19,9 +19,8 @@ scene.attachControl(new OrbitControl(camera, renderer.canvas))
 const player = new Player()
 document.body.appendChild(player.UIContainer)
 
-// const shape1 = new Shape1(player.frequencyData)
-// scene.add(shape1)
-scene.add(new Shape2(player.frequencyData))
+scene.add(new Shape1(player.frequencyData))
+// scene.add(new Shape2(player.frequencyData))
 
 // scene.add(new Cube())
 

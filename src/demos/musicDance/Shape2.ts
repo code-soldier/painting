@@ -1,4 +1,4 @@
-import { Mat4, ObjectGPU, Line, Vec3 } from "@/engine";
+import { Line } from "@/engine";
 
 const R = 10
 const DELTA = 2

@@ -39,7 +39,8 @@ const program = util.initProgram({
             vec2 center = vec2(0,0);
             vec2 uv = frag_uv-0.5;
             float strength = abs(.5*sin(time*0.001));
-            float range = .25;
+            strength = .9;
+            float range = .9;
 
             float dist = distance(uv,center);
             vec2 dir = normalize(uv-center);

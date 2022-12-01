@@ -18,8 +18,11 @@ export class FireWork extends ObjectGPU {
         meteorNum: number
         pos: Vec3
     }) {
-
+        setTimeout(() => {
+            debugger
+        }, 2000);
         let { meteorNum, pos } = params
+        meteorNum = 200
         super({ paramsGPU: { instanceNum: MAX_METEOR_NUM * MAX_SPARK_NUM } })
         this.pos = pos
         this.birth = +new Date()
@@ -85,9 +88,10 @@ class Meteor {
         return tps
     }
 
-    addSpark(now: number) { //前期产生慢
+    addSpark(now: number) {
+        if(now-this.birth<500) return
         this.produceCount++
-        if (this.produceCount == 5) {
+        if (this.produceCount == 3) {
             this.produceCount = 0
             const f = (num:number) => num+random(-1,1)
             this.sparks.push(new Spark({
@@ -114,7 +118,7 @@ class Particle {
 class Spark extends Particle {
     birth: number
     life: {
-        stage1: 1000 //变小
+        stage1: 500 //变小
     }
     constructor(p: {
         pos: Vec3
@@ -126,7 +130,7 @@ class Spark extends Particle {
     }
 
     frame(now: number): Particle | null {
-        this.size -= 0.001 
+        this.size -= 0.001/2
         if(this.size<=0){
             return null
         }
@@ -148,7 +152,7 @@ class MeteorHead extends Particle {
         vel: Vec4
     }) {
         const { pos, vel, birth } = p
-        super({ pos, size: 0.2 })
+        super({ pos, size: 0.4 })
         this.vel = vel
         this.birth = birth
     }
