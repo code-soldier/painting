@@ -1,3 +1,4 @@
+import { importImg } from "@/common/util";
 import { Renderer, Scene, Cube, SkyBox, AxesHelper, Fly1Control, OrbitControl, Mat4, Vec3, Camera } from "@/engine";
 import { Player } from './Player'
 import { Shape1 } from './Shape1'
@@ -14,6 +15,11 @@ camera = new Camera({
 // scene.attachControl(new Fly1Control(camera,renderer.canvas))
 scene.attachControl(new OrbitControl(camera, renderer.canvas))
 // scene.add(new AxesHelper())
+const skyBox = new SkyBox({
+    imgs: importImg(),
+    size: 10000,
+})
+scene.add(skyBox)
 
 
 const player = new Player()
