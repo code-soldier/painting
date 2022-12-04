@@ -25,8 +25,8 @@ scene.add(skyBox)
 const player = new Player()
 document.body.appendChild(player.UIContainer)
 
-scene.add(new Shape1(player.frequencyData))
-// scene.add(new Shape2(player.frequencyData))
+// scene.add(new Shape1(player.frequencyData))
+scene.add(new Shape2(player.frequencyData))
 
 // scene.add(new Cube())
 
