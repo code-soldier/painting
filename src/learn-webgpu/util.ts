@@ -103,7 +103,7 @@ export function createRenderPipeline({
         lastOffset += v * Float32Array.BYTES_PER_ELEMENT
         return obj as GPUVertexAttribute
     })
-    
+
 
     const rpl = device.createRenderPipeline({
         layout: 'auto',
@@ -138,7 +138,7 @@ export function createRenderPipeline({
 }
 
 
-export function createBindGroup({ bindings, rpl }) {
+export function createBindGroup({ bindings, rpl }: { bindings: GPUBindGroupEntry[], rpl: GPURenderPipeline }) {
     const bindGroup = device.createBindGroup({
         layout: rpl.getBindGroupLayout(0),
         entries: bindings,
@@ -146,15 +146,21 @@ export function createBindGroup({ bindings, rpl }) {
     return bindGroup
 }
 
-export function craeteBuffer({
-    data
+export function createBuffer({
+    data,
+    usage
 }: {
-    data: number[]
+    data: number[],
+    usage: number
 }) {
     const buffer = device.createBuffer({
         size: data.length * Float32Array.BYTES_PER_ELEMENT,
-        usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
+        usage,
     })
     device.queue.writeBuffer(buffer, 0, new Float32Array(data))
-    return buffer
+    
+    return {
+        buffer,
+        reWrite: (data:number[]) => device.queue.writeBuffer(buffer, 0, new Float32Array(data))
+    }
 }
