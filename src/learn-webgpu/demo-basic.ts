@@ -4,8 +4,8 @@ await util.initContext()
 
 const shader = /* wgsl */`
 struct VertexOutput {
-    @builtin(position) position : vec4<f32>,
-    @location(0) color : vec4<f32>,
+    @builtin(position) position : vec4f,
+    @location(0) color : vec4f,
 }
 
 @group(0) @binding(0) var<uniform> offsetX : f32;
@@ -17,20 +17,42 @@ fn vs_main(
     @location(1) color: vec3<f32>
 ) -> VertexOutput {
     var out: VertexOutput;
-    out.position = vec4<f32>(position.x + offsetX, position.y,0.0,1.0);
-    out.color = vec4<f32>(color,1.0);
+    out.position = vec4f(position.x + offsetX, position.y,0,1);
+    out.color = vec4f(color,1.0);
     return out;
 }
 
 @fragment
-fn fs_main(input: VertexOutput) -> @location(0) vec4<f32> {
+fn fs_main(input: VertexOutput) -> @location(0) vec4f {
     return input.color;
 }
 `
 
+
+const {
+    buffer:ubo,
+    reWrite,
+} = util.createBuffer({
+    data: [0],
+    usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
+})
+
+const {
+    bindGroup: bgp,
+    bindGroupLayout
+} = util.createBindGroup({
+    bindings: [{
+        binding: 0,
+        resource: {
+            buffer: ubo
+        }
+    }]
+})
+
 const rpl = util.createRenderPipeline({
     shader,
-    attrs: [2, 3]
+    attrs: [2, 3],
+    bindGroupLayouts: [bindGroupLayout]
 })
 
 const {
@@ -44,24 +66,6 @@ const {
     usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
 })
 
-
-const {
-    buffer:ubo,
-    reWrite,
-} = util.createBuffer({
-    data: [0],
-    usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
-})
-
-const bgp = util.createBindGroup({
-    rpl,
-    bindings: [{
-        binding: 0,
-        resource: {
-            buffer: ubo
-        }
-    }]
-})
 
 
 

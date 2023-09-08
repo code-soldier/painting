@@ -51,6 +51,102 @@ export function draw({
     passEncoder.draw(count)
 }
 
+export function createRenderPipeline({
+    attrs,
+    shader,
+    bindGroupLayouts
+}: {
+    attrs: number[], // [2,3] -> 前两个数代表坐标，后三个代表颜色
+    shader: string,
+    bindGroupLayouts: GPUBindGroupLayout[]
+}) {
+    const arrayStride = attrs.reduce((p, c) => p + c) * Float32Array.BYTES_PER_ELEMENT
+    let lastOffset = 0
+    let attributes = attrs.map((v, i) => {
+        let obj = {
+            shaderLocation: i,
+            offset: lastOffset,
+            format: 'float32x' + v,
+        }
+        lastOffset += v * Float32Array.BYTES_PER_ELEMENT
+        return obj as GPUVertexAttribute
+    })
+
+
+    const rpl = device.createRenderPipeline({
+        layout: device.createPipelineLayout({
+            bindGroupLayouts,
+        }),
+        vertex: {
+            module: device.createShaderModule({ code: shader }),
+            entryPoint: 'vs_main',
+            buffers: [{
+                arrayStride,
+                attributes,
+            }]
+        },
+        fragment: {
+            module: device.createShaderModule({ code: shader }),
+            entryPoint: 'fs_main',
+            targets: [{ format }]
+        },
+        primitive: {
+            topology: 'triangle-list',
+            // cullMode: 'back',
+            // frontFace: 'ccw'
+        },
+        // depthStencil: {
+        //     depthWriteEnabled: true,
+        //     depthCompare: 'less',
+        //     format: 'depth24plus'
+        // },
+        multisample: {
+            count: 4,
+        }
+    })
+    return rpl
+}
+
+
+export function createBindGroup({
+    bindings
+}: {
+    bindings: GPUBindGroupEntry[],
+}) {
+    const bindGroupLayout = device.createBindGroupLayout({
+        entries: bindings.map((_, i) => ({
+            binding: i,
+            visibility: GPUShaderStage.FRAGMENT | GPUShaderStage.VERTEX,
+            buffer: {}
+        }))
+    })
+    const bindGroup = device.createBindGroup({
+        layout: bindGroupLayout,
+        entries: bindings,
+    })
+    return { bindGroup, bindGroupLayout }
+}
+
+
+export function createBuffer({
+    data,
+    usage
+}: {
+    data: number[],
+    usage: number
+}) {
+    const buffer = device.createBuffer({
+        size: data.length * Float32Array.BYTES_PER_ELEMENT,
+        usage,
+    })
+    device.queue.writeBuffer(buffer, 0, new Float32Array(data))
+
+    return {
+        buffer,
+        reWrite: (data: number[]) => device.queue.writeBuffer(buffer, 0, new Float32Array(data))
+    }
+}
+
 export async function initContext() {
     if (!navigator.gpu)
         throw new Error('Not Support WebGPU')
@@ -83,84 +179,4 @@ export async function initContext() {
         format: format,
         sampleCount: 4,
     }).createView()
-}
-
-export function createRenderPipeline({
-    attrs,
-    shader
-}: {
-    attrs: number[], // [2,3] -> 前两个数代表坐标，后三个代表颜色
-    shader: string,
-}) {
-    const arrayStride = attrs.reduce((p, c) => p + c) * Float32Array.BYTES_PER_ELEMENT
-    let lastOffset = 0
-    let attributes = attrs.map((v, i) => {
-        let obj = {
-            shaderLocation: i,
-            offset: lastOffset,
-            format: 'float32x' + v,
-        }
-        lastOffset += v * Float32Array.BYTES_PER_ELEMENT
-        return obj as GPUVertexAttribute
-    })
-
-
-    const rpl = device.createRenderPipeline({
-        layout: 'auto',
-        vertex: {
-            module: device.createShaderModule({ code: shader }),
-            entryPoint: 'vs_main',
-            buffers: [{
-                arrayStride,
-                attributes,
-            }]
-        },
-        fragment: {
-            module: device.createShaderModule({ code: shader }),
-            entryPoint: 'fs_main',
-            targets: [{ format }]
-        },
-        primitive: {
-            topology: 'triangle-list',
-            // cullMode: 'back',
-            // frontFace: 'ccw'
-        },
-        // depthStencil: {
-        //     depthWriteEnabled: true,
-        //     depthCompare: 'less',
-        //     format: 'depth24plus'
-        // },
-        multisample: {
-            count: 4,
-        }
-    })
-    return rpl
-}
-
-
-export function createBindGroup({ bindings, rpl }: { bindings: GPUBindGroupEntry[], rpl: GPURenderPipeline }) {
-    const bindGroup = device.createBindGroup({
-        layout: rpl.getBindGroupLayout(0),
-        entries: bindings,
-    })
-    return bindGroup
-}
-
-export function createBuffer({
-    data,
-    usage
-}: {
-    data: number[],
-    usage: number
-}) {
-    const buffer = device.createBuffer({
-        size: data.length * Float32Array.BYTES_PER_ELEMENT,
-        usage,
-    })
-    device.queue.writeBuffer(buffer, 0, new Float32Array(data))
-    
-    return {
-        buffer,
-        reWrite: (data:number[]) => device.queue.writeBuffer(buffer, 0, new Float32Array(data))
-    }
 }
