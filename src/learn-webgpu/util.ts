@@ -13,11 +13,11 @@ export function createPassEncoder() {
     commandEncoder = device.createCommandEncoder()
     const renderPassDescriptor: GPURenderPassDescriptor = {
         colorAttachments: [{
-            view: context.getCurrentTexture().createView() || MSAAView,
+            view: MSAAView,
             clearValue: { r: 0, g: 0, b: 0, a: 1 },
             loadOp: 'clear',
             storeOp: 'store',
-            // resolveTarget: context.getCurrentTexture().createView(),
+            resolveTarget: context.getCurrentTexture().createView(),
         }],
         // depthStencilAttachment: {
         //     view: depthView,
@@ -130,9 +130,9 @@ export function createRenderPipeline({
         //     depthCompare: 'less',
         //     format: 'depth24plus'
         // },
-        // multisample: {
-        //     count: 4,
-        // }
+        multisample: {
+            count: 4,
+        }
     })
     return rpl
 }
