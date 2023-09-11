@@ -65,7 +65,7 @@ export function setAttribute({
 
 export function setUniform({ program, name, value, type }: { program: WebGLProgram, name: string, value: any, type?: number }) {
     gl.useProgram(program)
-    const loc = gl.getUniformLocation(program, name)
+    const loc: WebGLUniformLocation = gl.getUniformLocation(program, name)
     switch (type) {
         case gl.FLOAT: value.length ? gl.uniform1fv(loc,value) : gl.uniform1f(loc, value); break;
         case gl.INT: gl.uniform1i(loc, value); break;

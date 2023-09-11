@@ -1,12 +1,12 @@
-let canvas: HTMLCanvasElement
-let device: GPUDevice
-let context: GPUCanvasContext
-let format: GPUTextureFormat
-let depthView: GPUTextureView
-let MSAAView: GPUTextureView
+export let canvas: HTMLCanvasElement
+export let device: GPUDevice
+export let context: GPUCanvasContext
+export let format: GPUTextureFormat
+export let depthView: GPUTextureView
+export let MSAAView: GPUTextureView
 
-let commandEncoder: GPUCommandEncoder
-let passEncoder: GPURenderPassEncoder
+export let commandEncoder: GPUCommandEncoder
+export let passEncoder: GPURenderPassEncoder
 
 
 export function createPassEncoder() {
