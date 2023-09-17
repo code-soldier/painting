@@ -1,8 +1,4 @@
-type Attibute = {
-    name: string,
-    numberOfComponent: number,
-    data: number[]
-}
+
 
 class PrimitiveData {
 
@@ -37,6 +33,13 @@ export function buildBox({ width = 1, height = 1, depth = 1, widthSegments = 1, 
     const position = new Float32Array(num * 3);
     const normal = new Float32Array(num * 3);
     const uv = new Float32Array(num * 2);
+    const color = new Float32Array(num*3)
+    for(let i=0;i<num*3;i+=3){
+        const f = ()=> Math.random()
+        color[i] = f()
+        color[i+1] = f()
+        color[i+2] = f()
+    }
     const index = num > 65536 ? new Uint32Array(numIndices) : new Uint16Array(numIndices);
 
     let i = 0;
@@ -69,9 +72,10 @@ export function buildBox({ width = 1, height = 1, depth = 1, widthSegments = 1, 
 
     return {
         position: { size: 3, data: position },
-        normal: { size: 3, data: normal },
-        uv: { size: 2, data: uv },
-        index: { data: index },
+        // normal: { size: 3, data: normal },
+        // uv: { size: 2, data: uv },
+        color: {size: 3,data: color},
+        index: { data: index,isIndex: true },
     };
 }
 

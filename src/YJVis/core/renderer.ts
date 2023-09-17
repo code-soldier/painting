@@ -1,12 +1,17 @@
 import { Scene } from "./scene";
 import { GPURenderer } from '../gfx/webgpu'
 import { GLRenderer } from '../gfx/webgl'
+import { Control, OrbitControl } from "./control";
 
 export class Renderer {
 
     canvas: HTMLCanvasElement
 
     apiRenderer: GPURenderer | GLRenderer
+
+    scene: Scene
+
+    control: Control
 
     constructor(props?: {
         api?: 'webgpu' | 'webgl',
@@ -23,11 +28,11 @@ export class Renderer {
         this.apiRenderer.renderable = this
     }
 
-    render(scene: Scene) {
-        scene.updateWorldMatrix()
-        scene.camera.updateViewMatrix()
+    render() {
+        this.scene.updateWorldMatrix()
+        // this.scene.camera.updateViewMatrix()
         
-        this.apiRenderer.render(scene)
+        this.apiRenderer.render()
     }
 
     initCanvas(canvas?: HTMLCanvasElement) {

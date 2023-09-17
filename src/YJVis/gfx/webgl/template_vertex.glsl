@@ -1,11 +1,11 @@
 #version 300 es
 
-in vec3 pos;
-// in vec3 color;
+in vec3 position;
+in vec3 color;
 // in vec3 normal;
 // in vec2 uv;
 
-// out vec3 fragColor;
+out vec3 fragColor;
 // out vec3 fragNormal;
 // out vec2 fragUV;
 
@@ -13,9 +13,9 @@ uniform mat4 modelViewMatrix;
 uniform mat4 projectionMatrix;
 
 void main() {
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(pos,1.0);
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
 
-    // fragColor = color;
+    fragColor = color;
     // fragNormal = (modelViewMatrix * vec4(normal, 0.0)).xyz;
 
 }

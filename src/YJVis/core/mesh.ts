@@ -4,10 +4,12 @@ import { Node } from "./node";
 
 export class Mesh extends Node {
 
-    public material: Material
-    public geometry: Geometry
+    material: Material
+    geometry: Geometry
 
     constructor() {
         super()
+        this.material = new Material()
+        this.geometry = new Geometry()
     }
 }

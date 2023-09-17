@@ -15,7 +15,7 @@ export class GLRenderer {
 
     ) { }
 
-    render(scene: Scene) {
+    render() {
         if (!this.gl) {
             this.initWebGL()
         }
@@ -23,8 +23,7 @@ export class GLRenderer {
         gl.viewport(0, 0, innerWidth, innerHeight)
         gl.clearColor(0.0, 0.0, 0.0, 1)
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
-        this.scene = scene
-        this.traverse(scene)
+        this.traverse(this.renderable.scene)
     }
 
     traverse(node: Node) {
@@ -34,7 +33,7 @@ export class GLRenderer {
                 mesh = new GLMesh({
                     gl: this.gl,
                     renderable: node,
-                    scene: this.scene
+                    scene: this.renderable.scene
                 })
                 this.meshs.set(node, mesh)
             }

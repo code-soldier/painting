@@ -3,8 +3,9 @@
 precision highp float;
 precision highp int;
 
-// in vec3 fragColor;
+in vec3 fragColor;
 // in vec3 fragNormal;
+// in vec3 fragPosition;
 
 out vec4 finalColor;
 
@@ -19,8 +20,8 @@ void main() {
     // float diffuse = max(dot(normalize(dirLightDir), fragNormal), 0.0);
     // lightResult += dirLightColor * dirLightIntensity * diffuse;
 
-    // finalColor = vec4(fragColor * lightResult,1);
-    finalColor = vec4(1.0,0.0,0.0,1.0);
+    finalColor = vec4(fragColor ,1.0);
+    // finalColor = vec4(vec3(1.0) ,1.0);
 }
 
 // //VTK::System::Dec

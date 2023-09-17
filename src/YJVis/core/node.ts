@@ -20,9 +20,9 @@ export class Node {
 
     up: vec3
 
-    protected postion: vec3
-    protected scale: vec3
-    protected quatation: quat
+    postion: vec3
+    scale: vec3
+    quatation: quat
 
 
     constructor() {
@@ -78,7 +78,7 @@ export class Node {
     }
 
     lookAt(target: vec3, isCamera = false) {
-        if (!isCamera) mat4.targetTo(this.matirx, this.postion, target, this.up)
+        if (isCamera) mat4.targetTo(this.matirx, this.postion, target, this.up)
         else mat4.targetTo(this.matirx, target, this.postion, this.up)
         mat4.getRotation(this.quatation, this.matirx)
     }

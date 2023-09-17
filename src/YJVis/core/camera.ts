@@ -40,6 +40,7 @@ export class Camera extends Node {
     }
 
     updateViewMatrix(){
+        super.updateWorldMatrix()
         mat4.invert(this.viewMatrix, this.worldMatrix)
     }
 

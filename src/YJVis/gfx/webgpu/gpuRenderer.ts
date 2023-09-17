@@ -10,15 +10,15 @@ export class GPURenderer {
     context: GPUCanvasContext
     format: GPUTextureFormat
 
-    render(scene: Scene) {
+    render() {
         
         if (!this.device) {
             this.initWebGPU().then(_ => {
-                this.render(scene)
+                this.render()
             })
             return
         }
-        this.traverse(scene)
+        this.traverse(this.renderable.scene)
     }
 
     traverse(node: Node) {

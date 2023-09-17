@@ -4,22 +4,6 @@ import fs from './template_fragment.glsl?raw'
 import { buildBox } from "@/YJVis/core/polyData";
 import { mat4 } from "gl-matrix";
 
-const model = buildBox()
-
-type Model = {
-    [key: string]: Partial<Attibute>
-}
-
-type Attibute = {
-    name: string,
-    size: number,
-    data: number[],
-    stride: number
-    offset: number
-    type: number
-    isInstance: boolean // 实例化的数据是给每个实例，而不是每个顶点
-    isIndex: boolean // 特殊的数据，不需要传递给着色器
-}
 
 type Uniform = {
     value?: any,
@@ -93,17 +77,18 @@ class VBO {
 export class GLMesh {
 
     renderable: Mesh
-    model: Model
     program: WebGLProgram
     gl: WebGL2RenderingContext
     vao: WebGLVertexArrayObject
-    attributes: Record<string, Attibute> // 除了两种特殊的attr其它的需要打包
     uniforms: Record<string, Uniform>
     vertex: string
     fragment: string
     linked: boolean = false
 
-    scene: Scene // 为了拿到相机灯光
+    packedBuffer: WebGLBuffer
+    indexBuffer: WebGLBuffer
+
+    scene: Scene // 为了拿到相机和灯光
 
 
     constructor(props: {
@@ -115,13 +100,11 @@ export class GLMesh {
         this.gl = gl
         this.renderable = renderable
         this.scene = scene
-        this.vbo = new VBO(gl)
         this.program = gl.createProgram();
     }
 
     render() {
         this.updateShader()
-        this.bindVAO()
         this.updateAttribute()
         this.updateUniform()
         this.draw()
@@ -129,7 +112,15 @@ export class GLMesh {
 
     draw() {
         const gl = this.gl
-        gl.drawArrays(gl.TRIANGLES, 0, this.vbo.drawCount)
+        gl.enable(this.gl.DEPTH_TEST);
+        gl.depthMask(true);
+        const geometry = this.renderable.geometry
+        if (geometry.indexAttribute) {
+            gl.drawElements(gl.TRIANGLES, geometry.drawCount, gl.UNSIGNED_SHORT, 0)
+        } else {
+            gl.drawArrays(gl.TRIANGLES, 0, this.renderable.geometry.drawCount)
+        }
+
     }
 
     updateShader() {
@@ -141,28 +132,35 @@ export class GLMesh {
         }
     }
 
-    bindVAO() {
+    updateAttribute() {
         const gl = this.gl
-        if (!this.vao) {
+        const geometry = this.renderable.geometry
+        if (!this.packedBuffer) {
             this.vao = this.gl.createVertexArray()
             gl.bindVertexArray(this.vao)
-            this.vbo.build(model)
 
-            gl.bindBuffer(this.vbo.target, this.vbo.buffer)
-            this.vbo.attributes.forEach((attr, name) => {
-                gl.enableVertexAttribArray(attr.index)
-                gl.vertexAttribPointer(attr.index, attr.size, attr.type, attr.normalized, attr.stride * Float32Array.BYTES_PER_ELEMENT, attr.offset * Float32Array.BYTES_PER_ELEMENT)
-                gl.vertexAttribDivisor(attr.index, attr.divisor)
+
+            this.packedBuffer = gl.createBuffer()
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.packedBuffer)
+            gl.bufferData(gl.ARRAY_BUFFER, geometry.packedData, gl.STATIC_DRAW)
+            Object.values(geometry.attributes).forEach((attr) => {
+                const loc = gl.getAttribLocation(this.program, attr.name)
+                gl.enableVertexAttribArray(loc)
+                gl.vertexAttribPointer(loc, attr.size, gl.FLOAT, false, geometry.packedStride * Float32Array.BYTES_PER_ELEMENT, attr.offset * Float32Array.BYTES_PER_ELEMENT)
+                // gl.vertexAttribDivisor(loc, 1)
             })
-            // this.vbo.build(model)
-        } else {
-            this.gl.bindVertexArray(this.vao)
+
         }
+
+        if (!this.indexBuffer && geometry.indexAttribute) {
+            this.indexBuffer = gl.createBuffer()
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer)
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, geometry.indexAttribute.data as Uint16Array, gl.STATIC_DRAW)
+        }
+
+        gl.bindVertexArray(this.vao)
     }
 
-    updateAttribute() {
-
-    }
 
     updateUniform() {
         const gl = this.gl
@@ -177,13 +175,14 @@ export class GLMesh {
                     location,
                 }
             }
-            this.uniforms.modelViewMatrix.value = mat4.multiply(mat4.create(), this.scene.camera.viewMatrix, this.renderable.worldMatrix)
-            this.uniforms.projectionMatrix.value = this.scene.camera.projectionMatrix
+
             // this.uniforms.dirLightIntensity.value = 1
             // this.uniforms.dirLightColor.value = [1, 1, 1]
             // this.uniforms.dirLightDir.value = [1, 1, 1] // 相机的正方向
 
         }
+        this.uniforms.modelViewMatrix.value = mat4.multiply(mat4.create(), this.scene.camera.viewMatrix, this.renderable.worldMatrix)
+        this.uniforms.projectionMatrix.value = this.scene.camera.projectionMatrix
         Object.values(this.uniforms).forEach(uniform => {
             this.setUniform(uniform.activeInfo.type, uniform.location, uniform.value)
         })
@@ -192,7 +191,7 @@ export class GLMesh {
     setUniform(type: GLenum, location: WebGLUniformLocation, value: any) {
         const gl = this.gl
         switch (type) {
-            case 5126:
+            case gl.FLOAT:
                 return value.length ? gl.uniform1fv(location, value) : gl.uniform1f(location, value); // FLOAT
             case 35664:
                 return gl.uniform2fv(location, value); // FLOAT_VEC2
@@ -218,7 +217,7 @@ export class GLMesh {
                 return gl.uniformMatrix2fv(location, false, value); // FLOAT_MAT2
             case 35675:
                 return gl.uniformMatrix3fv(location, false, value); // FLOAT_MAT3
-            case 35676:
+            case gl.FLOAT_MAT4:
                 return gl.uniformMatrix4fv(location, false, value); // FLOAT_MAT4
         }
     }
